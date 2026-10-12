@@ -13,11 +13,14 @@ def _event_hits(s, m):
         if "min" in m:
             v = _num(e["props"].get(m["prop"]))
             if v is None or v < m["min"]: continue
+        if "contains" in m and not any(x in str(e["props"].get(m["prop"], "")) for x in m["contains"]): continue
         if "equals" in m and str(e["props"].get(m["prop"])) != str(m["equals"]): continue
         return e["ts"]
     return None
 
 def _available(s, kind, m):
+    if m.get("decides_miss") is False:  # a hit proves the step; a non-hit proves nothing
+        return False
     tl = s.get("timeline")
     if kind in ("click", "scroll_px", "input"): return tl is not None
     if kind == "event":
@@ -63,6 +66,22 @@ def score(session, intent):
         elif left_at is None: left_at = s["step"] if s["state"] == "missed" else f"{s['step']}?"
     return {"session": session["id"], "steps": states, "furthest_step": furthest, "left_at": left_at,
             "success": any(s["step"] == intent["success"] and s["state"] == "reached" for s in states)}
+
+def flag_bursts(sessions, window_s=120, min_n=3):
+    """>= min_n sessions, distinct visitor ids, same device profile, starting within window_s: automation.
+    Deterministic and stated in the report; flagged sessions are listed but left out of the counts."""
+    from datetime import datetime
+    from .render import device_key
+    ts = lambda s: datetime.fromisoformat(s["start"].replace("Z", "+00:00")).timestamp()
+    by = {}
+    for s in sessions: by.setdefault(device_key(s), []).append(s)
+    for key, group in by.items():
+        group.sort(key=ts)
+        for i, s in enumerate(group):
+            near = [g for g in group if abs(ts(g) - ts(s)) <= window_s]
+            if len({g["distinct_id"] for g in near}) >= min_n:
+                s["excluded"] = f"burst: {len(near)} sessions from {key} within {window_s}s, distinct ids (likely QA automation)"
+    return sessions
 
 def summary(scores, intent):
     out = []

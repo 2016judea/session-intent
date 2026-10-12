@@ -84,3 +84,16 @@ only: pageview, `time_on_page` dwell, and custom events. Scroll and clicks are
 unknown, not zero. The Score marks a step `unknown` rather than `missed` when its
 `match` needs data the session doesn't have, and the Finding reports how many
 sessions were rich versus thin.
+
+### Added after the first two runs (2026-10-12)
+
+- **Scroll-percentage events lie on long pages.** presale-detail is ~100k px tall (180 cards):
+  a visitor scrolled 3,785px and `time_on_page.max_depth` still said 0. Only rrweb scrollY, or an
+  interaction inside the list, proves a scroll step there. Matches can carry `decides_miss: false`
+  (a hit proves the step; a non-hit proves nothing, so the step stays `unknown`).
+- **QA automation passes `filterTestAccounts`.** Five sessions, five distinct ids, one 390x844
+  Chrome-iOS profile, inside one minute (presale-detail, 2026-10-10 18:40Z). The scorer leaves out
+  any burst of 3+ distinct ids from one device profile within 120s and prints that it did.
+- **One device can be all of a page's traffic.** /for/d9143508/: 18 sessions, 2 visitor ids, one
+  393x659 iPhone, every recording opening at a restored scrollY of 109px. Device count is printed
+  next to every finding.

@@ -9,25 +9,86 @@
   "measured_at": "393x659 WebKit, 2026-10-12: h1 71px, stats 447px, map 586-1226px, chips 1246px, sort 1361px, download 1390px, first row 1461px, document 7955px",
   "job": "A Minneapolis restaurant bookkeeper wants to know which restaurants are about to open, so he can reach them before they pick a bookkeeper.",
   "steps": [
-    {"id": "land", "label": "Opens the page",
-     "source": "website/for/d9143508/index.html:163 (h1)",
-     "match": [{"kind": "pageview", "path": "/for/d9143508/"}]},
-    {"id": "see_rows", "label": "Scrolls to the first restaurant row",
-     "source": "website/for/d9143508/index.html:175 (ol#list, rendered by render() at :219); sits under the map at :167",
-     "note": "first row top = 1461px at 393x659. scroll_depth 25 fires at scrollY+vh >= 24% of 7955 = 1909px, i.e. scrollY >= 1250: the first row is on screen by then.",
-     "match": [{"kind": "event", "event": "scroll_depth", "prop": "depth", "min": 25},
-               {"kind": "event", "event": "time_on_page", "prop": "max_depth", "min": 25},
-               {"kind": "scroll_px", "min": 900}]},
-    {"id": "narrow", "label": "Narrows the list (chip, sort, or Show more)",
-     "source": "website/for/d9143508/index.html:170 (#chips), :171 (#sort), :176 (#more)",
-     "optional": true,
-     "match": [{"kind": "event", "event": "filter"}, {"kind": "event", "event": "sort"},
-               {"kind": "click", "any": ["button.chip", "select#sort", "button#more"]}]},
-    {"id": "take", "label": "Takes the list (Download spreadsheet or Copy list)",
-     "source": "website/for/d9143508/index.html:172 (a[download], button#copy)",
-     "match": [{"kind": "event", "event": "download"},
-               {"kind": "click", "any": ["button#copy", "Download spreadsheet"]}]}
+    {
+      "id": "land",
+      "label": "Opens the page",
+      "source": "website/for/d9143508/index.html:163 (h1)",
+      "match": [
+        {
+          "kind": "pageview",
+          "path": "/for/d9143508/"
+        }
+      ]
+    },
+    {
+      "id": "see_rows",
+      "label": "Scrolls to the first restaurant row",
+      "source": "website/for/d9143508/index.html:175 (ol#list, rendered by render() at :219); sits under the map at :167; layout: .grid at :134, desktop two-column rule at :135, .mapbox style at :136",
+      "note": "first row top = 1461px at 393x659. scroll_depth 25 fires at scrollY+vh >= 24% of 7955 = 1909px, i.e. scrollY >= 1250: the first row is on screen by then.",
+      "match": [
+        {
+          "kind": "event",
+          "event": "scroll_depth",
+          "prop": "depth",
+          "min": 25
+        },
+        {
+          "kind": "event",
+          "event": "time_on_page",
+          "prop": "max_depth",
+          "min": 25
+        },
+        {
+          "kind": "scroll_px",
+          "min": 900
+        }
+      ]
+    },
+    {
+      "id": "narrow",
+      "label": "Narrows the list (chip, sort, or Show more)",
+      "source": "website/for/d9143508/index.html:170 (#chips), :171 (#sort), :176 (#more)",
+      "optional": true,
+      "match": [
+        {
+          "kind": "event",
+          "event": "filter"
+        },
+        {
+          "kind": "event",
+          "event": "sort"
+        },
+        {
+          "kind": "click",
+          "any": [
+            "button.chip",
+            "select#sort",
+            "button#more"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "take",
+      "label": "Takes the list (Download spreadsheet or Copy list)",
+      "source": "website/for/d9143508/index.html:172 (a[download], button#copy)",
+      "match": [
+        {
+          "kind": "event",
+          "event": "download"
+        },
+        {
+          "kind": "click",
+          "any": [
+            "button#copy",
+            "Download spreadsheet"
+          ]
+        }
+      ]
+    }
   ],
   "success": "take",
-  "known_exits": ["none: the page has no outbound links; leaving after 'take' is success"]
+  "known_exits": [
+    "none: the page has no outbound links; leaving after 'take' is success"
+  ]
 }
