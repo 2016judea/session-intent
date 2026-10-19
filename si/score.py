@@ -60,12 +60,20 @@ def score(session, intent):
         state = "reached" if hit else ("missed" if decidable else "unknown")
         states.append({"step": st["id"], "state": state, "at": hit})
         if hit: reached.append(st["id"])
+    # left_at = the first step not reached AFTER the furthest one reached. A step skipped on the
+    # way to a later one (an optional narrow before a download) is not where the session ended.
     furthest, left_at = None, None
+    optional = {st["id"] for st in intent["steps"] if st.get("optional")}
     for s in states:
-        if s["state"] == "reached": furthest = s["step"]
-        elif left_at is None: left_at = s["step"] if s["state"] == "missed" else f"{s['step']}?"
+        if s["state"] == "reached":
+            furthest, left_at = s["step"], None
+        elif left_at is None and s["step"] not in optional:
+            left_at = s["step"] if s["state"] == "missed" else f"{s['step']}?"
+    success = any(s["step"] == intent["success"] and s["state"] == "reached" for s in states)
+    if success:
+        left_at = None  # the job got done; whatever came after it is not an exit
     return {"session": session["id"], "steps": states, "furthest_step": furthest, "left_at": left_at,
-            "success": any(s["step"] == intent["success"] and s["state"] == "reached" for s in states)}
+            "success": success}
 
 def flag_bursts(sessions, window_s=120, min_n=3):
     """>= min_n sessions, distinct visitor ids, same device profile, starting within window_s: automation.

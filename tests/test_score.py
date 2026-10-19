@@ -45,3 +45,20 @@ def test_decode_posthog_compressed_full_snapshot():
     blob = "\n".join(json.dumps(l) for l in lines).encode()
     tl = rrweb.timeline(rrweb.decode(blob))
     assert tl["clicks"][0]["el"] == 'button#copy "Copy list"' and tl["viewport"] == [393, 659]
+
+def test_left_at_is_where_the_session_ended_not_a_step_it_skipped():
+    # events-only: lands, scrolls (max_depth 30), skips the optional narrow, downloads
+    intent = {"steps": INTENT["steps"][:2] + [{"id": "narrow", "optional": True,
+              "match": [{"kind": "event", "event": "filter"}]}] + INTENT["steps"][2:], "success": "take"}
+    sc = score.score(sess([("$pageview", {}), ("time_on_page", {"seconds": 40, "max_depth": 30}), ("download", {})]), intent)
+    assert states(sc) == ["reached", "reached", "missed", "reached", "unknown"]
+    assert sc["success"] and sc["furthest_step"] == "take" and sc["left_at"] is None
+    # a required step skipped on the way to a later one is not where they left either
+    sc = score.score(sess([("$pageview", {}), ("time_on_page", {"seconds": 3, "max_depth": 0}), ("download", {})]), intent)
+    assert states(sc)[:4] == ["reached", "missed", "missed", "reached"] and sc["left_at"] is None
+    # but a session that stops at the required step still reports it
+    sc = score.score(sess([("$pageview", {}), ("time_on_page", {"seconds": 3, "max_depth": 0})]), intent)
+    assert sc["left_at"] == "rows"
+    # an optional step is never the answer to "where did they leave"
+    sc = score.score(sess([("$pageview", {}), ("time_on_page", {"seconds": 40, "max_depth": 30})]), intent)
+    assert sc["left_at"] == "take"
