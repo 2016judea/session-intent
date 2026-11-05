@@ -1,7 +1,7 @@
 """PostHog API client: HogQL, recordings list, snapshot blobs. Reads keys from bricks/.env."""
 import json, os, pathlib, urllib.request, urllib.parse
 
-ENV = pathlib.Path(os.environ.get("SI_ENV", "~/Desktop/bricks/.env")).expanduser()
+ENV = pathlib.Path(os.environ.get("SI_ENV", "~/Desktop/workspace/bricks/.env")).expanduser()
 
 def _env():
     out = {}

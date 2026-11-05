@@ -41,7 +41,7 @@ python3 -m si <slug> --no-model     # counts + timelines only (reason in a Claud
 python3 -m pytest -q tests
 ```
 
-Keys come from `~/Desktop/bricks/.env` (`POSTHOG_PERSONAL_API_KEY`, `POSTHOG_PROJECT_ID`,
+Keys come from `~/Desktop/workspace/bricks/.env` (`POSTHOG_PERSONAL_API_KEY`, `POSTHOG_PROJECT_ID`,
 `POSTHOG_HOST`, `ANTHROPIC_API_KEY`); override the path with `SI_ENV`. Needs `anthropic`.
 A run costs about 6–10k input tokens.
 

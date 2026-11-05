@@ -3,7 +3,7 @@
   "name": "Restaurants opening (for Blue Vector Bookkeeping)",
   "host": "brickandmortar.dev",
   "path_prefix": "/for/d9143508/",
-  "repo": "~/Desktop/bricks",
+  "repo": "~/Desktop/workspace/bricks",
   "source_file": "website/for/d9143508/index.html",
   "source_commit": "6c736a1e",
   "measured_at": "393x659 WebKit, 2026-10-12: h1 71px, stats 447px, map 586-1226px, chips 1246px, sort 1361px, download 1390px, first row 1461px, document 7955px",
